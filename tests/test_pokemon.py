@@ -1,5 +1,6 @@
 import requests
 import pytest
+from dotmap import DotMap
 
 URL = "https://api.pokemonbattle.ru/v2"
 TOKEN = "your_token_must_be_here"
@@ -14,7 +15,8 @@ def test_get_my_trainer_name():
     response_get_my_trainer_name = requests.get(
         url=f"{URL}/trainers", headers=HEADER, params={"trainer_id": TRAINER_ID}
     )
-    assert response_get_my_trainer_name.json()["data"][0]["trainer_name"] == "минайчи"
+    object = DotMap(response_get_my_trainer_name.json())
+    assert object.data[0].trainer_name == "минайчи"
 
 @pytest.mark.parametrize(
     "key, value",
@@ -33,4 +35,6 @@ def test_parametrize(key, value):
     response_get_my_trainer = requests.get(
         url=f"{URL}/trainers", headers=HEADER, params={"trainer_id": TRAINER_ID}
     )
-    assert response_get_my_trainer.json()["data"][0][key] == value
+    object = DotMap(response_get_my_trainer.json())
+    item = object.data[0]
+    assert getattr(item, key) == value
